@@ -15,6 +15,7 @@ import { TerminalHttpProvider, SourceType } from "@terminal-packages/sdk";
 const portis = new Portis("process.env.portis", "mainnet");
 const apiKey = process.env.apiKey;
 const projectId = process.env.projectId;
+const ethereum = window.ethereum;
 
 const defaultObject = {
   apiKey,
@@ -56,7 +57,7 @@ const useStyles = makeStyles({
 const initWeb3 = (type, setWeb3) => {
   switch (type) {
     case "metamask":
-      !window.ethereum
+      !ethereum.selectedAddress
         ? window.ethereum.enable.then(() =>
             setWeb3(new Web3(window.terminal.ethereum))
           )
@@ -142,7 +143,7 @@ const App = () => {
           variant="contained"
           color="primary"
           disabled={!web3}
-          onClick={() => web3.eth.getBlockNumber()}
+          onClick={() => web3.eth.getBlockNumber().then(console.log)}
         >
           Get Block Number
         </Button>
