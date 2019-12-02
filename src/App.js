@@ -46,6 +46,10 @@ const useStyles = makeStyles({
   },
   web3ButtonWrapper: {
     marginTop: 50
+  },
+  web3Button: {
+    width: 250,
+    minWidth: 250
   }
 });
 
@@ -69,6 +73,8 @@ const initWeb3 = (type, setWeb3) => {
 const InitWeb3Button = ({ type, name, classes, setWeb3 }) => (
   <div className={classes.web3ButtonWrapper}>
     <Button
+      variant="contained"
+      color="primary"
       className={classes.web3Button}
       onClick={() => {
         initWeb3(type, setWeb3);
