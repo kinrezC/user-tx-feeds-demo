@@ -1,17 +1,68 @@
 import React, { useState, useEffect } from "react";
 import { makeStyles } from "@material-ui/styles";
-import { Typography, Button, Modal, Backdrop, Fade } from "@material-ui/core";
+import {
+  Typography,
+  Paper,
+  Button,
+  Dialog,
+  Backdrop,
+  Fade
+} from "@material-ui/core";
 import Web3 from "web3";
 import Portis from "@portis/web3";
 import { TerminalHttpProvider, SourceTypes } from "@terminal-packages/sdk";
 
-const portis = new Portis("486b2a54-3e4a-43fe-be5e-827a33750d0e", "mainnet");
+const portis = new Portis("process.env.portis", "mainnet");
 
-const useStyles = makeStyles({});
+const apiKey = process.env.apiKey;
+const projectId = process.env.projectId;
 
-const Web3Modal = ({ open, handleClose }) => {
+const defaultObject = {
+  apiKey,
+  projectId
+};
+
+const portisObject = {
+  ...defaultObject
+};
+
+const useStyles = makeStyles({
+  root: {
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center",
+    flexDirection: "column"
+  },
+  modal: {
+    display: "flex",
+    justifyContent: "flex-start",
+    alignItems: "center",
+    flexDirection: "column",
+    maxWidth: 450,
+    maxHeight: 600,
+    width: 450,
+    height: 600
+  }
+});
+
+const initWeb3 = type => {
+  switch (type) {
+    case "metamask":
+      window.ethereum.enable.then(() => new Web3(window.terminal.ethereum));
+    case "portis":
+      return new Web3(new TerminalHttpProvider(portisObject));
+  }
+};
+
+const InitWeb3Button = ({ type, name, classes }) => (
+  <Button className={classes.web3Button} onClick={() => initWeb3(type)}>
+    {name}
+  </Button>
+);
+
+const Web3Modal = ({ open, handleClose, classes }) => {
   return (
-    <Modal
+    <Dialog
       open={open}
       onClose={handleClose}
       BackdropComponent={Backdrop}
@@ -19,9 +70,13 @@ const Web3Modal = ({ open, handleClose }) => {
       closeAfterTransition
     >
       <Fade in={open}>
-        <Typography variant="h3">TEST MODAL</Typography>
+        <Paper className={classes.modal}>
+          <Typography variant="h4" style={{ marginTop: 50 }}>
+            Select Web3 Provider
+          </Typography>
+        </Paper>
       </Fade>
-    </Modal>
+    </Dialog>
   );
 };
 
@@ -38,11 +93,13 @@ const App = () => {
   };
 
   return (
-    <div>
-      <Button variant="contained" color="primary" onClick={handleOpen}>
-        OPEN MODAL
-      </Button>
-      <Web3Modal open={open} handleClose={handleClose} />
+    <div className={classes.root}>
+      <div style={{ marginTop: "15%" }}>
+        <Button variant="contained" color="primary" onClick={handleOpen}>
+          OPEN MODAL
+        </Button>
+      </div>
+      <Web3Modal open={open} handleClose={handleClose} classes={classes} />
     </div>
   );
 };
