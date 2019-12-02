@@ -54,31 +54,33 @@ const useStyles = makeStyles({
   }
 });
 
-const initWeb3 = (type, setWeb3) => {
+const initWeb3 = (type, setWeb3, handleClose) => {
   switch (type) {
     case "metamask":
       !ethereum.selectedAddress
-        ? window.ethereum.enable.then(() =>
-            setWeb3(new Web3(window.terminal.ethereum))
-          )
+        ? window.ethereum.enable.then(() => {
+            setWeb3(new Web3(window.terminal.ethereum));
+            handleClose();
+          })
         : setWeb3(new Web3(window.terminal.ethereum));
       break;
     case "portis":
       setWeb3(Web3(new TerminalHttpProvider(portisObject)));
+      handleClose();
       break;
     default:
       throw new Error("Invalid web3 option");
   }
 };
 
-const InitWeb3Button = ({ type, name, classes, setWeb3 }) => (
+const InitWeb3Button = ({ type, name, classes, setWeb3, handleClose }) => (
   <div className={classes.web3ButtonWrapper}>
     <Button
       variant="contained"
       color="primary"
       className={classes.web3Button}
       onClick={() => {
-        initWeb3(type, setWeb3);
+        initWeb3(type, setWeb3, handleClose);
       }}
     >
       {name}
@@ -105,12 +107,14 @@ const Web3Modal = ({ open, handleClose, classes, setWeb3 }) => {
             name="metamask"
             classes={classes}
             setWeb3={setWeb3}
+            handleClose={handleClose}
           />
           <InitWeb3Button
             type="portis"
             name="portis"
             classes={classes}
             setWeb3={setWeb3}
+            handleClose={handleClose}
           />
         </Paper>
       </Fade>
