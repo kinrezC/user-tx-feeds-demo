@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Typography, Button } from '@material-ui/core';
 
 import { data, abi } from './data';
@@ -9,6 +9,7 @@ const App = () => {
   const classes = useStyles();
   const [open, setOpen] = useState(false);
   const [web3, setWeb3] = useState(null);
+  const [contractAddress, setContractAddress] = useState(null);
   const [contractInstance, setContractInstance] = useState(null);
   const [dappStatus, setDappStatus] = useState('');
   const [accounts, setAccounts] = useState('');
@@ -38,6 +39,7 @@ const App = () => {
       })
       .then(r => {
         setContractInstance(new web3.eth.Contract(abi, r.contractAddress));
+        setContractAddress(r.contractAddress);
         setDappStatus(r.contractAddress);
       });
   };
@@ -58,6 +60,31 @@ const App = () => {
       .then(setDappStatus('Successfully Called SetValue!'));
   };
 
+  const sendFunds = () => {
+    web3.eth
+      .sendTransaction({
+        from: accounts[0],
+        to: contractAddress,
+        value: web3.utils.toWei('.2', 'ether'),
+      })
+      .then(setDappStatus('Sent .2 Ether'));
+  };
+
+  const getBalance = () => {
+    web3.eth
+      .getBalance(contractAddress)
+      .then(r =>
+        setDappStatus(`Contract Balance: ${web3.utils.fromWei(r, 'ether')}`),
+      );
+  };
+
+  const withdrawFunds = () => {
+    contractInstance.methods
+      .makeWithdrawal()
+      .send({ from: accounts[0] })
+      .then(setDappStatus('Withdrew Funds'));
+  };
+
   return (
     <div className={classes.root}>
       <div style={{ marginTop: '7%' }}>
@@ -71,7 +98,7 @@ const App = () => {
           OPEN MODAL
         </Button>
       </div>
-      <div style={{ marginTop: 45 }}>
+      <div style={{ marginTop: 20 }}>
         <Button
           variant="contained"
           color="primary"
@@ -123,6 +150,36 @@ const App = () => {
             onClick={() => sendTransaction()}
           >
             Send Transaction
+          </Button>
+        </div>
+        <div className={classes.buttonWrapper}>
+          <Button
+            variant="contained"
+            color="primary"
+            disabled={!web3 || !contractInstance}
+            onClick={() => sendFunds()}
+          >
+            Send Funds
+          </Button>
+        </div>
+        <div className={classes.buttonWrapper}>
+          <Button
+            variant="contained"
+            color="primary"
+            disabled={!web3 || !contractInstance}
+            onClick={() => getBalance()}
+          >
+            Contract Balance
+          </Button>
+        </div>
+        <div className={classes.buttonWrapper}>
+          <Button
+            variant="contained"
+            color="primary"
+            disabled={!web3 || !contractInstance}
+            onClick={() => withdrawFunds()}
+          >
+            Withdraw Funds
           </Button>
         </div>
       </div>

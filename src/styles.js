@@ -25,7 +25,7 @@ const useStyles = makeStyles({
     justifyContent: 'center',
     alignItems: 'center',
     flexDirection: 'center',
-    marginTop: 45,
+    marginTop: 20,
   },
   web3Button: {
     width: 250,
