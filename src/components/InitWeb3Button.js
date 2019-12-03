@@ -4,10 +4,10 @@ import Web3 from 'web3';
 import Portis from '@portis/web3';
 import { TerminalHttpProvider, SourceType } from '@terminal-packages/sdk';
 
-const portis = new Portis(process.env.portis, 'mainnet');
-const apiKey = process.env.apiKey;
-const projectId = process.env.projectId;
+const apiKey = 'o9HM6pbVw0Dt7XDwSDXGxw==';
+const projectId = 'POREbWlJGDVArgmw';
 const ethereum = window.ethereum;
+const portis = new Portis('8027dc2b-d250-4ab6-b5f5-9c732a5b131b', 'kovan');
 
 const defaultObject = {
   apiKey,
@@ -31,7 +31,7 @@ const initWeb3 = (type, setWeb3, handleClose) => {
         : setWeb3(new Web3(window.terminal.ethereum));
       break;
     case 'portis':
-      setWeb3(Web3(new TerminalHttpProvider(portisObject)));
+      setWeb3(new Web3(new TerminalHttpProvider(portisObject)));
       handleClose();
       break;
     default:
