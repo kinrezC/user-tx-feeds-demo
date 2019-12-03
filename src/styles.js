@@ -12,9 +12,9 @@ const useStyles = makeStyles({
     justifyContent: 'flex-start',
     alignItems: 'center',
     flexDirection: 'column',
-    maxWidth: 450,
+    maxWidth: 550,
     maxHeight: 600,
-    width: 450,
+    width: 550,
     height: 600,
   },
   web3ButtonWrapper: {

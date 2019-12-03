@@ -1,102 +1,9 @@
 import React, { useState } from 'react';
-import { makeStyles } from '@material-ui/styles';
-import {
-  Typography,
-  Paper,
-  Button,
-  Dialog,
-  Backdrop,
-  Fade,
-} from '@material-ui/core';
-import Web3 from 'web3';
-import Portis from '@portis/web3';
-import { TerminalHttpProvider, SourceType } from '@terminal-packages/sdk';
+import { Typography, Button } from '@material-ui/core';
+
 import { data, abi } from './data';
+import Web3Modal from './components/Web3Modal';
 import useStyles from './styles';
-
-const portis = new Portis('process.env.portis', 'mainnet');
-const apiKey = process.env.apiKey;
-const projectId = process.env.projectId;
-const ethereum = window.ethereum;
-
-const defaultObject = {
-  apiKey,
-  projectId,
-};
-
-const portisObject = {
-  ...defaultObject,
-  customHttpProvider: portis.provider,
-  source: SourceType.Portis,
-};
-
-const initWeb3 = (type, setWeb3, handleClose) => {
-  switch (type) {
-    case 'metamask':
-      !ethereum.selectedAddress
-        ? window.ethereum.enable.then(() => {
-            setWeb3(new Web3(window.terminal.ethereum));
-            handleClose();
-          })
-        : setWeb3(new Web3(window.terminal.ethereum));
-      break;
-    case 'portis':
-      setWeb3(Web3(new TerminalHttpProvider(portisObject)));
-      handleClose();
-      break;
-    default:
-      throw new Error('Invalid web3 option');
-  }
-};
-
-const InitWeb3Button = ({ type, name, classes, setWeb3, handleClose }) => (
-  <div className={classes.web3ButtonWrapper}>
-    <Button
-      variant="contained"
-      color="primary"
-      className={classes.web3Button}
-      onClick={() => {
-        initWeb3(type, setWeb3, handleClose);
-      }}
-    >
-      {name}
-    </Button>
-  </div>
-);
-
-const Web3Modal = ({ open, handleClose, classes, setWeb3 }) => {
-  return (
-    <Dialog
-      open={open}
-      onClose={handleClose}
-      BackdropComponent={Backdrop}
-      BackdropProps={{ timeout: 500 }}
-      closeAfterTransition
-    >
-      <Fade in={open}>
-        <Paper className={classes.modal}>
-          <Typography variant="h4" style={{ marginTop: 50 }}>
-            Select Web3 Provider
-          </Typography>
-          <InitWeb3Button
-            type="metamask"
-            name="metamask"
-            classes={classes}
-            setWeb3={setWeb3}
-            handleClose={handleClose}
-          />
-          <InitWeb3Button
-            type="portis"
-            name="portis"
-            classes={classes}
-            setWeb3={setWeb3}
-            handleClose={handleClose}
-          />
-        </Paper>
-      </Fade>
-    </Dialog>
-  );
-};
 
 const App = () => {
   const classes = useStyles();
@@ -122,7 +29,7 @@ const App = () => {
       })
       .then(r => {
         setContractInstance(new web3.eth.Contract(abi, r.contractAddress));
-        setDappStatus('Contract Deployed Successfully!');
+        setDappStatus(r.contractAddress);
       });
   };
 
@@ -130,14 +37,14 @@ const App = () => {
     contractInstance.methods
       .getValue()
       .call()
-      .then(r => setDappStatus(r));
+      .then(r => setDappStatus(`Current Value: ${r}`));
   };
 
   const sendTransaction = () => {
     const max = Math.ceil(2000);
     const min = Math.floor(2);
     contractInstance.methods
-      .setNumber(Math.random() * max - min + min)
+      .setNumber(Math.round(Math.random() * max - min + min))
       .send({ from: window.ethereum.selectedAddress })
       .then(setDappStatus('Successfully Called SetValue!'));
   };
@@ -157,7 +64,11 @@ const App = () => {
           variant="contained"
           color="primary"
           disabled={!web3}
-          onClick={() => web3.eth.getBlockNumber().then(r => setDappStatus(r))}
+          onClick={() =>
+            web3.eth
+              .getBlockNumber()
+              .then(r => setDappStatus(`Block Number: ${r}`))
+          }
         >
           Get Block Number
         </Button>
@@ -191,9 +102,9 @@ const App = () => {
             Send Transaction
           </Button>
         </div>
-        <div className={classes.buttonWrapper}>
-          <Typography variant="h4">{dappStatus}</Typography>
-        </div>
+      </div>
+      <div className={classes.buttonWrapper}>
+        <Typography variant="h4">{dappStatus}</Typography>
       </div>
       <Web3Modal
         open={open}
