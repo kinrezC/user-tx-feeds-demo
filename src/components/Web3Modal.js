@@ -3,7 +3,13 @@ import { Dialog, Fade, Paper, Typography, Backdrop } from '@material-ui/core';
 
 import InitWeb3Button from './InitWeb3Button';
 
-const Web3Modal = ({ open, handleClose, classes, setWeb3 }) => {
+const Web3Modal = ({
+  open,
+  handleClose,
+  classes,
+  setWeb3,
+  setCurrentProvider,
+}) => {
   return (
     <Dialog
       open={open}
@@ -23,6 +29,7 @@ const Web3Modal = ({ open, handleClose, classes, setWeb3 }) => {
             classes={classes}
             setWeb3={setWeb3}
             handleClose={handleClose}
+            setCurrentProvider={setCurrentProvider}
           />
           <InitWeb3Button
             type="portis"
@@ -30,6 +37,7 @@ const Web3Modal = ({ open, handleClose, classes, setWeb3 }) => {
             classes={classes}
             setWeb3={setWeb3}
             handleClose={handleClose}
+            setCurrentProvider={setCurrentProvider}
           />
         </Paper>
       </Fade>

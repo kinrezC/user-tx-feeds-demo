@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Typography, Button } from '@material-ui/core';
 
 import { data, abi } from './data';
@@ -11,6 +11,8 @@ const App = () => {
   const [web3, setWeb3] = useState(null);
   const [contractInstance, setContractInstance] = useState(null);
   const [dappStatus, setDappStatus] = useState('');
+  const [accounts, setAccounts] = useState('');
+  const [currentProvider, setCurrentProvider] = useState('No Wallet Detected');
 
   const handleOpen = () => {
     setOpen(true);
@@ -20,10 +22,17 @@ const App = () => {
     setOpen(false);
   };
 
+  const setTheAccount = () => {
+    web3.eth.getAccounts().then(r => {
+      setAccounts(r);
+      setDappStatus(`Current Account: ${r[0]}`);
+    });
+  };
+
   const deployContract = () => {
     web3.eth
       .sendTransaction({
-        from: window.ethereum.selectedAddress,
+        from: accounts[0],
         data: data,
         gasLimit: '800000',
       })
@@ -45,7 +54,7 @@ const App = () => {
     const min = Math.floor(2);
     contractInstance.methods
       .setNumber(Math.round(Math.random() * max - min + min))
-      .send({ from: window.ethereum.selectedAddress })
+      .send({ from: accounts[0] })
       .then(setDappStatus('Successfully Called SetValue!'));
   };
 
@@ -54,7 +63,10 @@ const App = () => {
       <div style={{ marginTop: '7%' }}>
         <Typography variant="h2">Sample Dapp</Typography>
       </div>
-      <div style={{ marginTop: '5%' }}>
+      <div style={{ marginTop: 20 }}>
+        <Typography variant="h4">{currentProvider}</Typography>
+      </div>
+      <div style={{ marginTop: '2%' }}>
         <Button variant="contained" color="primary" onClick={handleOpen}>
           OPEN MODAL
         </Button>
@@ -65,13 +77,24 @@ const App = () => {
           color="primary"
           disabled={!web3}
           onClick={() =>
-            web3.eth
-              .getBlockNumber()
-              .then(r => setDappStatus(`Block Number: ${r}`))
+            web3.eth.getBlockNumber().then(r => {
+              setDappStatus(`Block Number: ${r}`);
+              console.log(accounts[0]);
+            })
           }
         >
           Get Block Number
         </Button>
+        <div className={classes.buttonWrapper}>
+          <Button
+            variant="contained"
+            color="primary"
+            disabled={!web3}
+            onClick={() => setTheAccount()}
+          >
+            Set Account
+          </Button>
+        </div>
         <div className={classes.buttonWrapper}>
           <Button
             variant="contained"
@@ -111,6 +134,7 @@ const App = () => {
         handleClose={handleClose}
         classes={classes}
         setWeb3={setWeb3}
+        setCurrentProvider={setCurrentProvider}
       />
     </div>
   );

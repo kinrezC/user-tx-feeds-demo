@@ -20,33 +20,40 @@ const portisObject = {
   source: SourceType.Portis,
 };
 
-const initWeb3 = (type, setWeb3, handleClose) => {
+const initWeb3 = (type, setWeb3, handleClose, setCurrentProvider) => {
   switch (type) {
     case 'metamask':
       !ethereum.selectedAddress
         ? window.ethereum.enable.then(() => {
             setWeb3(new Web3(window.terminal.ethereum));
-            handleClose();
           })
         : setWeb3(new Web3(window.terminal.ethereum));
+      setCurrentProvider('MetaMask');
       break;
     case 'portis':
       setWeb3(new Web3(new TerminalHttpProvider(portisObject)));
-      handleClose();
+      setCurrentProvider('Portis');
       break;
     default:
       throw new Error('Invalid web3 option');
   }
 };
 
-const InitWeb3Button = ({ type, name, classes, setWeb3, handleClose }) => (
+const InitWeb3Button = ({
+  type,
+  name,
+  classes,
+  setWeb3,
+  handleClose,
+  setCurrentProvider,
+}) => (
   <div className={classes.web3ButtonWrapper}>
     <Button
       variant="contained"
       color="primary"
       className={classes.web3Button}
       onClick={() => {
-        initWeb3(type, setWeb3, handleClose);
+        initWeb3(type, setWeb3, handleClose, setCurrentProvider);
       }}
     >
       {name}
