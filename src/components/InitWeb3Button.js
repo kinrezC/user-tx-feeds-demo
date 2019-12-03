@@ -4,7 +4,7 @@ import Web3 from 'web3';
 import Portis from '@portis/web3';
 import { TerminalHttpProvider, SourceType } from '@terminal-packages/sdk';
 
-const portis = new Portis('process.env.portis', 'mainnet');
+const portis = new Portis(process.env.portis, 'mainnet');
 const apiKey = process.env.apiKey;
 const projectId = process.env.projectId;
 const ethereum = window.ethereum;
