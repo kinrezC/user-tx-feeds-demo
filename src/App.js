@@ -1,37 +1,38 @@
-import React, { useState } from "react";
-import { makeStyles } from "@material-ui/styles";
+import React, { useState } from 'react';
+import { makeStyles } from '@material-ui/styles';
 import {
   Typography,
   Paper,
   Button,
   Dialog,
   Backdrop,
-  Fade
-} from "@material-ui/core";
-import Web3 from "web3";
-import Portis from "@portis/web3";
-import { TerminalHttpProvider, SourceType } from "@terminal-packages/sdk";
-import { data, abi } from "./data";
+  Fade,
+} from '@material-ui/core';
+import Web3 from 'web3';
+import Portis from '@portis/web3';
+import { TerminalHttpProvider, SourceType } from '@terminal-packages/sdk';
+import { data, abi } from './data';
+import useStyles from './styles';
 
-const portis = new Portis("process.env.portis", "mainnet");
+const portis = new Portis('process.env.portis', 'mainnet');
 const apiKey = process.env.apiKey;
 const projectId = process.env.projectId;
 const ethereum = window.ethereum;
 
 const defaultObject = {
   apiKey,
-  projectId
+  projectId,
 };
 
 const portisObject = {
   ...defaultObject,
   customHttpProvider: portis.provider,
-  source: SourceType.Portis
+  source: SourceType.Portis,
 };
 
 const initWeb3 = (type, setWeb3, handleClose) => {
   switch (type) {
-    case "metamask":
+    case 'metamask':
       !ethereum.selectedAddress
         ? window.ethereum.enable.then(() => {
             setWeb3(new Web3(window.terminal.ethereum));
@@ -39,12 +40,12 @@ const initWeb3 = (type, setWeb3, handleClose) => {
           })
         : setWeb3(new Web3(window.terminal.ethereum));
       break;
-    case "portis":
+    case 'portis':
       setWeb3(Web3(new TerminalHttpProvider(portisObject)));
       handleClose();
       break;
     default:
-      throw new Error("Invalid web3 option");
+      throw new Error('Invalid web3 option');
   }
 };
 
@@ -97,51 +98,12 @@ const Web3Modal = ({ open, handleClose, classes, setWeb3 }) => {
   );
 };
 
-const useStyles = makeStyles({
-  root: {
-    display: "flex",
-    justifyContent: "center",
-    alignItems: "center",
-    flexDirection: "column"
-  },
-  modal: {
-    display: "flex",
-    justifyContent: "flex-start",
-    alignItems: "center",
-    flexDirection: "column",
-    maxWidth: 450,
-    maxHeight: 600,
-    width: 450,
-    height: 600
-  },
-  web3ButtonWrapper: {
-    marginTop: 50
-  },
-  buttonWrapper: {
-    display: "flex",
-    justifyContent: "center",
-    alignItems: "center",
-    flexDirection: "center",
-    marginTop: 45
-  },
-  web3Button: {
-    width: 250,
-    minWidth: 250
-  },
-  dappStatus: {
-    display: "flex",
-    justifyContent: "center",
-    alignItems: "center",
-    flexDirection: "center"
-  }
-});
-
 const App = () => {
   const classes = useStyles();
   const [open, setOpen] = useState(false);
   const [web3, setWeb3] = useState(null);
   const [contractInstance, setContractInstance] = useState(null);
-  const [dappStatus, setDappStatus] = useState("");
+  const [dappStatus, setDappStatus] = useState('');
 
   const handleOpen = () => {
     setOpen(true);
@@ -156,11 +118,11 @@ const App = () => {
       .sendTransaction({
         from: window.ethereum.selectedAddress,
         data: data,
-        gasLimit: "800000"
+        gasLimit: '800000',
       })
       .then(r => {
         setContractInstance(new web3.eth.Contract(abi, r.contractAddress));
-        setDappStatus("Contract Deployed Successfully!");
+        setDappStatus('Contract Deployed Successfully!');
       });
   };
 
@@ -177,15 +139,15 @@ const App = () => {
     contractInstance.methods
       .setNumber(Math.random() * max - min + min)
       .send({ from: window.ethereum.selectedAddress })
-      .then(setDappStatus("Successfully Called SetValue!"));
+      .then(setDappStatus('Successfully Called SetValue!'));
   };
 
   return (
     <div className={classes.root}>
-      <div style={{ marginTop: "7%" }}>
+      <div style={{ marginTop: '7%' }}>
         <Typography variant="h2">Sample Dapp</Typography>
       </div>
-      <div style={{ marginTop: "5%" }}>
+      <div style={{ marginTop: '5%' }}>
         <Button variant="contained" color="primary" onClick={handleOpen}>
           OPEN MODAL
         </Button>
